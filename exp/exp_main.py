@@ -161,17 +161,17 @@ class Exp_Main(Exp_Basic):
                     outputs_l = outputs_l[:, -self.args.pred_len:, f_dim:]
                     outputs_u = outputs_u[:, -self.args.pred_len:, f_dim:]
 
-                    for i in range(len(self.args.num_experts)):
+                    for i in range(self.args.num_experts):
                         expert_outputs_l[i] = expert_outputs_l[i][:, -self.args.pred_len:, f_dim:]
-                    for i in range(len(self.args.num_experts)):
+                    for i in range(self.args.num_experts):
                         expert_outputs_u[i] = expert_outputs_u[i][:, -self.args.pred_len:, f_dim:]
 
                     batch_y = batch_y[:, -self.args.pred_len:, f_dim:].to(self.device)
 
                     l_loss = criterion(outputs_l, batch_y)
-                    for i in range(len(self.args.num_experts)):
+                    for i in range(self.args.num_experts):
                         l_loss += criterion(expert_outputs_l[i], batch_y)
-                    l_loss /= len(self.args.num_experts)+1
+                    l_loss /= self.args.num_experts+1
                     
                     loss = l_loss
 
