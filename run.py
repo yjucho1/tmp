@@ -85,16 +85,16 @@ if __name__ == '__main__':
         args.device_ids = [int(id_) for id_ in device_ids]
         args.gpu = args.device_ids[0]
 
-    # if fix_seed==9:
-    #     args.gpu = 0 
-    # elif fix_seed==123:
-    #     args.gpu = 1 
-    # elif fix_seed==999:
-    #     args.gpu = 2 
-    # elif fix_seed==2024:
-    #     args.gpu = 3 
-    # else:
-    #     args.gpu = 0
+    if fix_seed==22:
+        args.gpu = 0 
+    elif fix_seed==123:
+        args.gpu = 1 
+    elif fix_seed==999:
+        args.gpu = 2 
+    elif fix_seed==2024:
+        args.gpu = 3 
+    else:
+        args.gpu = 0
     
     args.patch_size_list = np.array(args.patch_size_list).tolist()
 

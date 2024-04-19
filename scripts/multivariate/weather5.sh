@@ -34,7 +34,7 @@ do
       --k 2\
       --d_model 8 \
       --d_ff 64 \
-      --train_epochs 30\
+      --train_epochs 100\
       --patience 10\
       --lradj 'TST'\
       --itr 1 \
@@ -58,7 +58,7 @@ do
       --k 2\
       --d_model 8 \
       --d_ff 64 \
-      --train_epochs 30\
+      --train_epochs 100\
       --patience 10\
       --lradj 'TST'\
       --itr 1 \
@@ -82,7 +82,7 @@ do
       --k 2\
       --d_model 8 \
       --d_ff 64 \
-      --train_epochs 30\
+      --train_epochs 100\
       --patience 10\
       --lradj 'TST'\
       --itr 1 \
@@ -106,7 +106,7 @@ do
       --k 2\
       --d_model 8 \
       --d_ff 64 \
-      --train_epochs 30\
+      --train_epochs 100\
       --patience 10\
       --lradj 'TST'\
       --itr 1 \
