@@ -179,7 +179,7 @@ class Exp_Main(Exp_Basic):
                         # loss = loss + balance_loss
                     train_loss.append(loss.item())
                     labeled_loss.append(l_loss.item())
-                    unlabeled_loss.append(u_loss.item())
+                    # unlabeled_loss.append(u_loss.item())
 
                 if (i + 1) % 100 == 0:
                     print("\titers: {0}, epoch: {1} | loss: {2:.7f}".format(i + 1, epoch + 1, loss.item()))
