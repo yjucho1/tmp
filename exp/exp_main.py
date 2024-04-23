@@ -24,7 +24,7 @@ warnings.filterwarnings('ignore')
 class Exp_Main(Exp_Basic):
     def __init__(self, args):
         super(Exp_Main, self).__init__(args)
-        run = wandb.init(project="0419_pathformer_o", config=self.args, resume="None", id=self.args.model + '_' +self.args.model_id+'_'+str(self.args.random_seed))
+        run = wandb.init(project="0423_pathformer_c", config=self.args, resume="None", id=self.args.model + '_' +self.args.model_id+'_'+str(self.args.random_seed))
         wandb.run.log_code(".")
 
     def _build_model(self):
@@ -173,13 +173,20 @@ class Exp_Main(Exp_Basic):
                         l_loss += criterion(expert_outputs_l[i], batch_y)
                     l_loss /= self.args.num_experts+1
                     
-                    loss = l_loss
+                    u_loss = 0
+                    for i in range(self.args.num_experts):
+                        u_loss += criterion(expert_outputs_u[i], outputs_u)
+                    u_loss /= self.args.num_experts
+                    
+                     ## total loss
+                    w = np.clip((epoch-10)/self.args.train_epochs, 0, 1.0)
+                    loss = l_loss + w * u_loss
 
                     # if self.args.model=="PathFormer":
                         # loss = loss + balance_loss
                     train_loss.append(loss.item())
                     labeled_loss.append(l_loss.item())
-                    # unlabeled_loss.append(u_loss.item())
+                    unlabeled_loss.append(u_loss.item())
 
                 if (i + 1) % 100 == 0:
                     print("\titers: {0}, epoch: {1} | loss: {2:.7f}".format(i + 1, epoch + 1, loss.item()))
@@ -243,6 +250,7 @@ class Exp_Main(Exp_Basic):
             self.model.load_state_dict(torch.load(os.path.join('./checkpoints/' + setting, 'checkpoint.pth')))
 
         preds = []
+        preds_e = []
         trues = []
         inputx = []
         folder_path = './test_results/' + setting + '/'
@@ -267,49 +275,68 @@ class Exp_Main(Exp_Basic):
                             outputs = self.model(batch_x)
                 else:
                     if self.args.model == 'PathFormer':
-                        outputs, _ = self.model(batch_x)
+                        outputs, ensemble_outputs = self.model(batch_x)
+                        # ensemble_outputs.append(outputs)
+                        ensemble_outputs = torch.stack(ensemble_outputs, dim=-1)
+                        ensemble_outputs = torch.mean(ensemble_outputs, dim=-1)
+                        ensemble_outputs = torch.stack([ensemble_outputs, outputs], dim=-1)
+                        ensemble_outputs = torch.mean(ensemble_outputs, dim=-1)
                     else:
                         outputs = self.model(batch_x)
                 f_dim = -1 if self.args.features == 'MS' else 0
 
                 outputs = outputs[:, -self.args.pred_len:, f_dim:]
                 batch_y = batch_y[:, -self.args.pred_len:, f_dim:].to(self.device)
+                ensemble_outputs = ensemble_outputs[:, -self.args.pred_len:, f_dim:]
+
                 outputs = outputs.detach().cpu().numpy()
                 batch_y = batch_y.detach().cpu().numpy()
+                ensemble_outputs = ensemble_outputs.detach().cpu().numpy()
 
                 pred = outputs  # outputs.detach().cpu().numpy()  # .squeeze()
+                pred_e = ensemble_outputs  # batch_y.detach().cpu().numpy()  # .squeeze()
                 true = batch_y  # batch_y.detach().cpu().numpy()  # .squeeze()
 
                 preds.append(pred)
                 trues.append(true)
+                preds_e.append(pred_e)
                 inputx.append(batch_x.detach().cpu().numpy())
 
                 if i % 20 == 0:
                     input = batch_x.detach().cpu().numpy()
                     gt = np.concatenate((input[0, :, -1], true[0, :, -1]), axis=0)
                     pd = np.concatenate((input[0, :, -1], pred[0, :, -1]), axis=0)
-                    visual(gt, pd, os.path.join(folder_path, str(i) + '.pdf'))
+                    # visual(gt, pd, os.path.join(folder_path, str(i) + '.pdf'))
 
         if self.args.test_flop:
             test_params_flop((batch_x.shape[1], batch_x.shape[2]))
             exit()
         preds = np.array(preds)
+        preds_e = np.array(preds_e)
         trues = np.array(trues)
         inputx = np.array(inputx)
 
         preds = preds.reshape(-1, preds.shape[-2], preds.shape[-1])
+        preds_e = preds_e.reshape(-1, preds_e.shape[-2], preds_e.shape[-1])
         trues = trues.reshape(-1, trues.shape[-2], trues.shape[-1])
         inputx = inputx.reshape(-1, inputx.shape[-2], inputx.shape[-1])
 
         mae, mse, rmse, mape, mspe, rse, corr = metric(preds, trues)
         print('mse:{}, mae:{}, rse:{}'.format(mse, mae, rse))
         wandb.log({
-            "result/mse": mse,
-            "result/mae": mae
+            "result/mse_c": mse,
+            "result/mae_c": mae
+        })
+        mae_e, mse_e, rmse_e, mape_e, mspe_e, rse_e, corr_e = metric(preds_e, trues)
+        print('mse_e:{}, mae_e:{}, rse_e:{}'.format(mse_e, mae_e, rse_e))
+        wandb.log({
+            "result/mse_e": mse_e,
+            "result/mae_e": mae_e
         })
         f = open("result.txt", 'a')
         f.write(setting + "  \n")
         f.write('mse:{}, mae:{}, rse:{}'.format(mse, mae, rse))
+        f.write('mse_e:{}, mae_e:{}, rse_e:{}'.format(mse_e, mae_e, rse_e))
         f.write('\n')
         f.write('\n')
         f.close()
