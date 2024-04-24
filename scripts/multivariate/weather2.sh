@@ -14,7 +14,7 @@ model_id_name=weather
 data_name=custom
 
 
-for pred_len in 96 192 720
+for pred_len in 96 192 336 720
 do
     # python -u run.py \
     #   --random_seed 22 \

@@ -7,7 +7,7 @@
 #SBATCH --mem=10000MB                         # Using 10GB CPU Memory
 #SBATCH --cpus-per-task=4                     # Using 4 maximum processor
 
-source /home/${USER}/.bashrc
-source /home/${USER}/miniconda3/bin/activate
+source /home/s3/${USER}/.bashrc
+source /home/s3/${USER}/anaconda3/bin/activate
 conda activate lisa_env
-srun sh scripts/multivariate/weather2.sh
+srun sh scripts/multivariate/weather4.sh
