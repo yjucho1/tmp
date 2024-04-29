@@ -8,7 +8,7 @@ fi
 seq_len=96
 model_name=PathFormer
 
-root_path_name=./dataset/ETT/
+root_path_name=./dataset/ETT-small/
 data_path_name=ETTh2.csv
 model_id_name=ETTh2
 data_name=ETTh2

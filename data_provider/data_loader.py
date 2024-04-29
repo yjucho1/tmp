@@ -73,18 +73,22 @@ class Dataset_ETT_hour(Dataset):
             data_stamp = data_stamp.transpose(1, 0)
         
         if self.unlabeled == 1:
-            points = np.arange(0, len(data[border1:border2]), 1)
-            f = interp1d(points, data[border1:border2], axis=0)
-            xnew = np.arange(0.5, len(data[border1:border2])-1, 1)
+            points = np.arange(0, len(data), 1)
+            f = interp1d(points, data, axis=0)
+            xnew = np.arange(0.5, len(data)-1, 1)
             data_u = f(xnew)
-            np.random.shuffle(data_u)
-            self.data_u = data_u
+            self.data_u = data_u[border1:border2]
         else:
             self.data_u = None
-
         self.data_x = data[border1:border2]
         self.data_y = data[border1:border2]
         self.data_stamp = data_stamp
+        self.index_map = {}
+        u_idx = np.arange(len(self.data_u)-self.seq_len)
+        np.random.shuffle(u_idx)
+        for i in range(len(self.data_u)-self.seq_len): 
+            self.index_map[i] = u_idx[i]
+
 
     def __getitem__(self, index):
         s_begin = index
@@ -92,12 +96,20 @@ class Dataset_ETT_hour(Dataset):
         r_begin = s_end
         r_end = r_begin + self.pred_len
 
+        u_index = self.index_map[index]
+        u_begin =u_index
+        u_end = u_begin + self.seq_len
+
         seq_x = self.data_x[s_begin:s_end]
         seq_y = self.data_y[r_begin:r_end]
         seq_x_mark = self.data_stamp[s_begin:s_end]
         seq_y_mark = self.data_stamp[r_begin:r_end]
 
-        return seq_x, seq_y, seq_x_mark, seq_y_mark
+        if self.unlabeled == 1:
+            seq_u = self.data_u[u_begin:u_end]
+            return seq_x, seq_y, seq_u, seq_x_mark, seq_y_mark
+        else:
+            return seq_x, seq_y, seq_x_mark, seq_y_mark
 
     def __len__(self):
         return len(self.data_x) - self.seq_len - self.pred_len + 1
@@ -172,18 +184,22 @@ class Dataset_ETT_minute(Dataset):
             data_stamp = data_stamp.transpose(1, 0)
 
         if self.unlabeled == 1:
-            points = np.arange(0, len(data[border1:border2]), 1)
-            f = interp1d(points, data[border1:border2], axis=0)
-            xnew = np.arange(0.5, len(data[border1:border2])-1, 1)
+            points = np.arange(0, len(data), 1)
+            f = interp1d(points, data, axis=0)
+            xnew = np.arange(0.5, len(data)-1, 1)
             data_u = f(xnew)
-            np.random.shuffle(data_u)
-            self.data_u = data_u
+            self.data_u = data_u[border1:border2]
         else:
             self.data_u = None
-
         self.data_x = data[border1:border2]
         self.data_y = data[border1:border2]
         self.data_stamp = data_stamp
+        self.index_map = {}
+        u_idx = np.arange(len(self.data_u)-self.seq_len)
+        np.random.shuffle(u_idx)
+        for i in range(len(self.data_u)-self.seq_len): 
+            self.index_map[i] = u_idx[i]
+
 
     def __getitem__(self, index):
         s_begin = index
@@ -191,12 +207,20 @@ class Dataset_ETT_minute(Dataset):
         r_begin = s_end
         r_end = r_begin + self.pred_len
 
+        u_index = self.index_map[index]
+        u_begin =u_index
+        u_end = u_begin + self.seq_len
+
         seq_x = self.data_x[s_begin:s_end]
         seq_y = self.data_y[r_begin:r_end]
         seq_x_mark = self.data_stamp[s_begin:s_end]
         seq_y_mark = self.data_stamp[r_begin:r_end]
 
-        return seq_x, seq_y, seq_x_mark, seq_y_mark
+        if self.unlabeled == 1:
+            seq_u = self.data_u[u_begin:u_end]
+            return seq_x, seq_y, seq_u, seq_x_mark, seq_y_mark
+        else:
+            return seq_x, seq_y, seq_x_mark, seq_y_mark
 
     def __len__(self):
         return len(self.data_x) - self.seq_len - self.pred_len + 1
@@ -282,9 +306,9 @@ class Dataset_Custom(Dataset):
             data_stamp = data_stamp.transpose(1, 0)
 
         if self.unlabeled == 1:
-            points = np.arange(0, len(data[border1:border2]), 1)
-            f = interp1d(points, data[border1:border2], axis=0)
-            xnew = np.arange(0.5, len(data[border1:border2])-1, 1)
+            points = np.arange(0, len(data), 1)
+            f = interp1d(points, data, axis=0)
+            xnew = np.arange(0.5, len(data)-1, 1)
             data_u = f(xnew)
             self.data_u = data_u[border1:border2]
         else:
@@ -293,9 +317,9 @@ class Dataset_Custom(Dataset):
         self.data_y = data[border1:border2]
         self.data_stamp = data_stamp
         self.index_map = {}
-        u_idx = np.arange(len(self.data_x)-self.seq_len)
+        u_idx = np.arange(len(self.data_u)-self.seq_len)
         np.random.shuffle(u_idx)
-        for i in range(len(self.data_x)-self.seq_len): 
+        for i in range(len(self.data_u)-self.seq_len): 
             self.index_map[i] = u_idx[i]
 
     def __getitem__(self, index):
