@@ -96,7 +96,7 @@ class AMS(nn.Module):
         # else:
         #     load = self._gates_to_load(gates)
         
-        gates = torch.ones(256, 4)/4
+        gates = torch.ones(x.shape[0], self.num_experts)/self.num_experts
         gates = gates.to(device=x.device)
         load = self._gates_to_load(gates)
 

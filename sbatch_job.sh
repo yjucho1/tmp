@@ -10,4 +10,4 @@
 source /home/s3/${USER}/.bashrc
 source /home/s3/${USER}/anaconda3/bin/activate
 conda activate lisa_env
-srun sh scripts/multivariate/weather4.sh
+srun sh scripts/multivariate/electricity.sh
