@@ -24,7 +24,7 @@ warnings.filterwarnings('ignore')
 class Exp_Main(Exp_Basic):
     def __init__(self, args):
         super(Exp_Main, self).__init__(args)
-        run = wandb.init(project="0424_pathformer_o", config=self.args, resume="None", id=self.args.model + '_' +self.args.model_id+'_'+str(self.args.random_seed))
+        run = wandb.init(project="exp_pathformer_o", config=self.args, resume="None", id=self.args.model + '_' +self.args.model_id+'_'+str(self.args.random_seed))
         wandb.run.log_code(".")
 
     def _build_model(self):
@@ -169,9 +169,9 @@ class Exp_Main(Exp_Basic):
                     batch_y = batch_y[:, -self.args.pred_len:, f_dim:].to(self.device)
 
                     l_loss = criterion(outputs_l, batch_y)
-                    # for i in range(self.args.num_experts):
-                        # l_loss += criterion(expert_outputs_l[i], batch_y)
-                    # l_loss /= self.args.num_experts+1
+                    for i in range(self.args.num_experts):
+                        l_loss += criterion(expert_outputs_l[i], batch_y)
+                    l_loss /= self.args.num_experts+1
                     
                     u_loss = 0
                     for i in range(self.args.num_experts):
