@@ -13,7 +13,7 @@ warnings.filterwarnings('ignore')
 class Dataset_ETT_hour(Dataset):
     def __init__(self, root_path, flag='train', size=None,
                  features='S', data_path='ETTh1.csv',
-                 target='OT', scale=True, timeenc=0, freq='h'):
+                 target='OT', scale=True, timeenc=0, freq='h', unlabeled=1):
         # size [seq_len, pred_len]
         if size == None:
             self.seq_len = 24 * 4 * 4
@@ -31,6 +31,7 @@ class Dataset_ETT_hour(Dataset):
         self.scale = scale
         self.timeenc = timeenc
         self.freq = freq
+        self.unlabeled = unlabeled
 
         self.root_path = root_path
         self.data_path = data_path
@@ -70,6 +71,16 @@ class Dataset_ETT_hour(Dataset):
         elif self.timeenc == 1:
             data_stamp = time_features(pd.to_datetime(df_stamp['date'].values), freq=self.freq)
             data_stamp = data_stamp.transpose(1, 0)
+        
+        if self.unlabeled == 1:
+            points = np.arange(0, len(data[border1:border2]), 1)
+            f = interp1d(points, data[border1:border2], axis=0)
+            xnew = np.arange(0.5, len(data[border1:border2])-1, 1)
+            data_u = f(xnew)
+            np.random.shuffle(data_u)
+            self.data_u = data_u
+        else:
+            self.data_u = None
 
         self.data_x = data[border1:border2]
         self.data_y = data[border1:border2]
@@ -98,7 +109,7 @@ class Dataset_ETT_hour(Dataset):
 class Dataset_ETT_minute(Dataset):
     def __init__(self, root_path, flag='train', size=None,
                  features='S', data_path='ETTm1.csv',
-                 target='OT', scale=True, timeenc=0, freq='t'):
+                 target='OT', scale=True, timeenc=0, freq='t', unlabeled=1):
         # size [seq_len, pred_len]
         # info
         if size == None:
@@ -117,6 +128,7 @@ class Dataset_ETT_minute(Dataset):
         self.scale = scale
         self.timeenc = timeenc
         self.freq = freq
+        self.unlabeled = unlabeled
 
         self.root_path = root_path
         self.data_path = data_path
@@ -158,6 +170,16 @@ class Dataset_ETT_minute(Dataset):
         elif self.timeenc == 1:
             data_stamp = time_features(pd.to_datetime(df_stamp['date'].values), freq=self.freq)
             data_stamp = data_stamp.transpose(1, 0)
+
+        if self.unlabeled == 1:
+            points = np.arange(0, len(data[border1:border2]), 1)
+            f = interp1d(points, data[border1:border2], axis=0)
+            xnew = np.arange(0.5, len(data[border1:border2])-1, 1)
+            data_u = f(xnew)
+            np.random.shuffle(data_u)
+            self.data_u = data_u
+        else:
+            self.data_u = None
 
         self.data_x = data[border1:border2]
         self.data_y = data[border1:border2]
@@ -264,14 +286,17 @@ class Dataset_Custom(Dataset):
             f = interp1d(points, data[border1:border2], axis=0)
             xnew = np.arange(0.5, len(data[border1:border2])-1, 1)
             data_u = f(xnew)
-            np.random.shuffle(data_u)
-            self.data_u = data_u
+            self.data_u = data_u[border1:border2]
         else:
             self.data_u = None
         self.data_x = data[border1:border2]
         self.data_y = data[border1:border2]
         self.data_stamp = data_stamp
-
+        self.index_map = {}
+        u_idx = np.arange(len(self.data_x)-self.seq_len)
+        np.random.shuffle(u_idx)
+        for i in range(len(self.data_x)-self.seq_len): 
+            self.index_map[i] = u_idx[i]
 
     def __getitem__(self, index):
         s_begin = index
@@ -279,13 +304,17 @@ class Dataset_Custom(Dataset):
         r_begin = s_end
         r_end = r_begin + self.pred_len
 
+        u_index = self.index_map[index]
+        u_begin =u_index
+        u_end = u_begin + self.seq_len
+
         seq_x = self.data_x[s_begin:s_end]
         seq_y = self.data_y[r_begin:r_end]
         seq_x_mark = self.data_stamp[s_begin:s_end]
         seq_y_mark = self.data_stamp[r_begin:r_end]
 
         if self.unlabeled == 1:
-            seq_u = self.data_u[s_begin:s_end]
+            seq_u = self.data_u[u_begin:u_end]
             return seq_x, seq_y, seq_u, seq_x_mark, seq_y_mark
         else:
             return seq_x, seq_y, seq_x_mark, seq_y_mark
