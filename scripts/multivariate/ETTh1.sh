@@ -18,6 +18,7 @@ do
 for pred_len in 96
 do
     python -u run.py \
+      --random_seed $random_seed \
       --is_training 1 \
       --root_path $root_path_name \
       --data_path $data_path_name \
@@ -27,9 +28,9 @@ do
       --features M \
       --seq_len $seq_len \
       --pred_len $pred_len \
-      --patch_size_list 16 12 8 32 12 8 6 4 8 6 4 2 \
+      --patch_size_list 16 12 8 32\
       --num_nodes 7 \
-      --layer_nums 3 \
+      --layer_nums 1 \
       --residual_connection 1\
       --k 3\
       --d_model 4 \
@@ -38,13 +39,14 @@ do
       --patience 10\
       --lradj 'TST'\
       --itr 1 \
-      --batch_size 128 --learning_rate 0.0005 >logs/LongForecasting/$model_name'_'$model_id_name'_'$seq_len'_'$pred_len.log
+      --batch_size 128 --learning_rate 0.0005 >logs/LongForecasting/$random_seed'_'$model_name'_'$model_id_name'_'$seq_len'_'$pred_len.log
 done
 
 
 for pred_len in 192
 do
     python -u run.py \
+      --random_seed $random_seed \
       --is_training 1 \
       --root_path $root_path_name \
       --data_path $data_path_name \
@@ -54,9 +56,9 @@ do
       --features M \
       --seq_len $seq_len \
       --pred_len $pred_len \
-      --patch_size_list 16 12 8 32 12 8 6 4 8 6 4 2 \
+      --patch_size_list 16 12 8 32 \
       --num_nodes 7 \
-      --layer_nums 3 \
+      --layer_nums 1 \
       --residual_connection 1\
       --k 3\
       --d_model 4 \
@@ -65,12 +67,13 @@ do
       --patience 10\
       --lradj 'TST'\
       --itr 1 \
-      --batch_size 128 --learning_rate 0.0005 >logs/LongForecasting/$model_name'_'$model_id_name'_'$seq_len'_'$pred_len.log
+      --batch_size 128 --learning_rate 0.0005 >logs/LongForecasting/$random_seed'_'$model_name'_'$model_id_name'_'$seq_len'_'$pred_len.log
 done
 
 for pred_len in 336
 do
     python -u run.py \
+      --random_seed $random_seed \
       --is_training 1 \
       --root_path $root_path_name \
       --data_path $data_path_name \
@@ -80,9 +83,9 @@ do
       --features M \
       --seq_len $seq_len \
       --pred_len $pred_len \
-      --patch_size_list 16 12 8 32 12 8 6 16 8 6 4 16 \
+      --patch_size_list 16 12 8 32\
       --num_nodes 7 \
-      --layer_nums 3 \
+      --layer_nums 1 \
       --residual_connection 0\
       --k 3\
       --d_model 4 \
@@ -91,13 +94,14 @@ do
       --patience 10\
       --lradj 'TST'\
       --itr 1 \
-      --batch_size 512 --learning_rate 0.0005 >logs/LongForecasting/$model_name'_'$model_id_name'_'$seq_len'_'$pred_len.log
+      --batch_size 512 --learning_rate 0.0005 >logs/LongForecasting/$random_seed'_'$model_name'_'$model_id_name'_'$seq_len'_'$pred_len.log
 done
 
 
 for pred_len in 720
 do
     python -u run.py \
+      --random_seed $random_seed \
       --is_training 1 \
       --root_path $root_path_name \
       --data_path $data_path_name \
@@ -107,9 +111,9 @@ do
       --features M \
       --seq_len $seq_len \
       --pred_len $pred_len \
-      --patch_size_list 16 12 8 32 12 8 6 4 8 6 4 2 \
+      --patch_size_list 16 12 8 32\
       --num_nodes 7 \
-      --layer_nums 3 \
+      --layer_nums 1 \
       --residual_connection 0\
       --k 2\
       --d_model 4 \
@@ -118,7 +122,7 @@ do
       --patience 10\
       --lradj 'TST'\
       --itr 1 \
-      --batch_size 512 --learning_rate 0.0005 >logs/LongForecasting/$model_name'_'$model_id_name'_'$seq_len'_'$pred_len.log
+      --batch_size 512 --learning_rate 0.0005 >logs/LongForecasting/$random_seed'_'$model_name'_'$model_id_name'_'$seq_len'_'$pred_len.log
 done
 
 done

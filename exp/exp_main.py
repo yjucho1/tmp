@@ -24,7 +24,7 @@ warnings.filterwarnings('ignore')
 class Exp_Main(Exp_Basic):
     def __init__(self, args):
         super(Exp_Main, self).__init__(args)
-        run = wandb.init(project="exp_pathformer_o", config=self.args, resume="None", id=self.args.model + '_' +self.args.model_id+'_'+str(self.args.random_seed))
+        run = wandb.init(project="exp_pathformer_o", config=self.args, resume="never", id=self.args.model + '2_' +self.args.model_id+'_'+str(self.args.random_seed))
         wandb.run.log_code(".")
 
     def _build_model(self):

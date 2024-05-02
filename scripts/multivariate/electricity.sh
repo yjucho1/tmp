@@ -29,18 +29,18 @@ do
       --seq_len $seq_len \
       --pred_len $pred_len \
       --num_nodes 321 \
-      --layer_nums 3 \
+      --layer_nums 1 \
       --residual_connection 1\
       --k 2\
       --d_model 16 \
       --d_ff 128 \
-      --patch_size_list 16 12 8 32 12 8 6 4 8 6 4 2 \
+      --patch_size_list 16 12 8 32 \
       --train_epochs 50\
       --patience 10 \
       --lradj 'TST' \
       --pct_start 0.2 \
       --itr 1 \
-      --batch_size 8 --learning_rate 0.001 >logs/LongForecasting/$model_name'_'$model_id_name'_'$seq_len'_'$pred_len.log
+      --batch_size 8 --learning_rate 0.001 >logs/LongForecasting/$random_seed'_'$model_name'_'$model_id_name'_'$seq_len'_'$pred_len.log
 done
 done
 
