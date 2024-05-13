@@ -32,7 +32,7 @@ do
       --patch_size_list 16 12 8 4\
       --residual_connection 1\
       --num_nodes 7 \
-      --layer_nums 3 \
+      --layer_nums 1 \
       --k 3\
       --d_model 8 \
       --d_ff 64 \
