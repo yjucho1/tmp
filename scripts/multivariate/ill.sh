@@ -13,7 +13,7 @@ data_path_name=national_illness.csv
 model_id_name=illness
 data_name=custom
 
-for random_seed in 22 123 999 2024
+for random_seed in 456
 do
 for pred_len in 24 36 48 60
 do
@@ -38,6 +38,6 @@ do
       --patience 10\
       --lradj 'TST'\
       --itr 1 \
-      --batch_size 16 --learning_rate 0.0025 >logs/LongForecasting/$random_seed'_'$model_name'_'$model_id_name'_'$seq_len'_'$pred_len.log
+      --batch_size 32 --learning_rate 0.0025 >logs/LongForecasting/$random_seed'_'$model_name'_'$model_id_name'_'$seq_len'_'$pred_len.log
 done
 done

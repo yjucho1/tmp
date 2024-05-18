@@ -13,7 +13,7 @@ data_path_name=electricity.csv
 model_id_name=electricity
 data_name=custom
 
-for random_seed in 22 123 999 2024
+for random_seed in 2024
 do
 for pred_len in 96 192 336 720
 do

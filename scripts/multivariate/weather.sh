@@ -13,9 +13,9 @@ data_path_name=weather.csv
 model_id_name=weather
 data_name=custom
 
-for random_seed in 22 2024
+for random_seed in 2024
 do
-for pred_len in 336
+for pred_len in 336 
 do
     python -u run.py \
       --random_seed $random_seed \

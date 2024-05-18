@@ -13,9 +13,9 @@ data_path_name=ETTh2.csv
 model_id_name=ETTh2
 data_name=ETTh2
 
-for random_seed in 22 123 999 2024
+for random_seed in 456
 do
-for pred_len in 96
+for pred_len in 96 192 336 720
 do
     python -u run.py \
       --random_seed $random_seed \
