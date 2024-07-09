@@ -119,23 +119,24 @@ if __name__ == '__main__':
 
 
 
-            print('>>>>>>>start training : {}>>>>>>>>>>>>>>>>>>>>>>>>>>'.format(setting))
-            exp.train(setting)
+            # print('>>>>>>>start training : {}>>>>>>>>>>>>>>>>>>>>>>>>>>'.format(setting))
+            # exp.train(setting)
 
-            time_now = time.time()
-            print('>>>>>>>testing : {}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'.format(setting))
-            exp.test(setting)
-            print('Inference time: ', time.time() - time_now)
+            # time_now = time.time()
+            # print('>>>>>>>testing : {}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'.format(setting))
+            # exp.test(setting)
+            # print('Inference time: ', time.time() - time_now)
 
-            if args.do_predict:
-                print('>>>>>>>predicting : {}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'.format(setting))
-                exp.predict(setting, True)
-
-            torch.cuda.empty_cache()
-
-            # exp.autoregressive_test(setting)
+            # if args.do_predict:
+            #     print('>>>>>>>predicting : {}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<'.format(setting))
+            #     exp.predict(setting, True)
 
             # torch.cuda.empty_cache()
+
+            print('>>>>>>>autoregressive predicting : {}>>>>>>>>>>>>>>>>>>>>>>>>>>'.format(setting))
+            exp.autoregressive_test(setting)
+
+            torch.cuda.empty_cache()
     else:
         ii = 0
         setting = '{}_{}_ft{}_sl{}_pl{}_{}_{}'.format(

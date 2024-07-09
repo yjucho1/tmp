@@ -24,7 +24,7 @@ warnings.filterwarnings('ignore')
 class Exp_Main(Exp_Basic):
     def __init__(self, args):
         super(Exp_Main, self).__init__(args)
-        run = wandb.init(project="exp_pathformer_o", config=self.args, resume="None", id=self.args.model + '4_' +self.args.model_id+'_'+str(self.args.random_seed))
+        run = wandb.init(project="new_exp_o_sloss", config=self.args, resume="None", id=self.args.model +'_'+self.args.model_id+'_'+str(self.args.random_seed))
         wandb.run.log_code(".")
 
     def _build_model(self):
@@ -389,4 +389,116 @@ class Exp_Main(Exp_Basic):
         #
         # np.save(folder_path + 'real_prediction.npy', preds)
 
+        return
+    
+    def autoregressive_test(self, setting, test=1):
+        test_data, test_loader = self._get_data(flag='test')
+
+        print('loading model')
+        self.model.load_state_dict(torch.load(os.path.join('./checkpoints/' + setting, 'checkpoint.pth')))
+
+        multi_ar_newly_mse = []
+        multi_ar_newly_mae = []
+        multi_ar_all_mse = []
+        multi_ar_all_mae = []
+        ones_ar_newly_mse = []
+        ones_ar_newly_mae = []
+        ones_ar_all_mse = []
+        ones_ar_all_mae = []
+
+        hop = 2
+        pred_lookback = self.args.seq_len 
+
+        self.model.eval()
+
+        mse_criterion = nn.MSELoss()
+        mae_criterion = nn.L1Loss()
+
+        with torch.no_grad():
+            for i in range(len(test_data.data_x)-self.args.seq_len):
+                inp = torch.from_numpy(test_data.data_x[i:i+self.args.seq_len]).float().reshape(1, self.args.seq_len, -1).to(self.device)
+                out, _ = self.model(inp)
+                ar_out = torch.empty((1, 0, out.shape[2])).to(self.device)
+                all_out = out.clone().to(self.device)
+
+                for j in range(0, pred_lookback, hop):
+                    inp = torch.cat((inp[:, hop:, :], out[:, :hop, :]), axis=1)    
+                    out, _ = self.model(inp)
+                    ar_out = torch.cat((ar_out, out[:, -hop:, :]), axis=1) # 뒤에 hop개가 새로 얻게 되는 부분    
+                    if j+hop >= self.args.pred_len:
+                        break
+                j = j + hop  ## lookback 업데이트된 갯수 = prediction length beyond horizon
+                all_out = torch.cat((all_out[:, j:, :], ar_out), axis=1)
+                if i+j+self.args.seq_len+self.args.pred_len < len(test_data.data_x) :
+                    gt = torch.from_numpy(test_data.data_x[i+j+self.args.seq_len-1:i+j+self.args.seq_len+self.args.pred_len-1]).float().reshape(1, self.args.pred_len, -1)
+                    gt = gt.to(self.device) 
+                    newly_mse = mse_criterion(ar_out, gt[:, -j:, :]) # 뒤에 j개가 새로 얻게 되는 부분
+                    newly_mae = mae_criterion(ar_out, gt[:, -j:, :]) 
+                    all_mse = mse_criterion(all_out, gt)
+                    all_mae = mae_criterion(all_out, gt) 
+                    multi_ar_newly_mse.append(newly_mse.item())
+                    multi_ar_newly_mae.append(newly_mae.item())
+                    multi_ar_all_mse.append(all_mse.item())
+                    multi_ar_all_mae.append(all_mae.item())
+                else:
+                    break 
+                if i % 100 == 0:
+                    print(i)
+
+            for i in range(len(test_data.data_x)-self.args.seq_len):
+                inp = torch.from_numpy(test_data.data_x[i:i+self.args.seq_len]).float().reshape(1, self.args.seq_len, -1).to(self.device)
+                out, _ = self.model(inp)
+                all_out = out.clone().to(self.device)
+                inp = torch.cat((inp[:, j:, :], out[:, :j, :]), axis=1)    
+                out, _ = self.model(inp)
+                all_out = torch.cat((all_out[:, j:, :], out[:,-j:,:]), axis=1)
+                if i+j+self.args.seq_len+self.args.pred_len < len(test_data.data_x) :
+                    gt = torch.from_numpy(test_data.data_x[i+j+self.args.seq_len-1:i+j+self.args.seq_len+self.args.pred_len-1]).float().reshape(1, self.args.pred_len, -1)
+                    gt = gt.to(self.device)
+                    newly_mse = mse_criterion(out[:, -j:, :], gt[:, -j:, :])
+                    newly_mae = mae_criterion(out[:, -j:, :], gt[:, -j:, :])
+                    all_mse = mse_criterion(all_out, gt)
+                    all_mae = mae_criterion(all_out, gt) 
+                    ones_ar_newly_mse.append(newly_mse.item())
+                    ones_ar_newly_mae.append(newly_mae.item())
+                    ones_ar_all_mse.append(all_mse.item())
+                    ones_ar_all_mae.append(all_mae.item())
+
+                else:
+                    break
+                if i % 100 == 0:
+                    print(i)
+
+        multi_ar_newly_mse = np.average(multi_ar_newly_mse)
+        multi_ar_newly_mae = np.average(multi_ar_newly_mae)
+        multi_ar_all_mse = np.average(multi_ar_all_mse)
+        multi_ar_all_mae = np.average(multi_ar_all_mae)
+        ones_ar_newly_mse = np.average(ones_ar_newly_mse)
+        ones_ar_newly_mae = np.average(ones_ar_newly_mae)
+        ones_ar_all_mse = np.average(ones_ar_all_mse)
+        ones_ar_all_mae = np.average(ones_ar_all_mae)
+        
+        print('mse: ', ones_ar_newly_mse, multi_ar_newly_mse)
+        print('mae: ', ones_ar_newly_mae, multi_ar_newly_mae)
+
+        print('mse: ', ones_ar_all_mse, multi_ar_all_mse)
+        print('mae: ', ones_ar_all_mae, multi_ar_all_mae)
+
+        f = open("96_autoregressive_result.txt", 'a')
+        f.write(setting + ",  ")
+        f.write('{}, {}, {}, {},'.format(ones_ar_newly_mse, ones_ar_newly_mae, multi_ar_newly_mse, multi_ar_newly_mae))
+        f.write('{}, {}, {}, {},'.format(ones_ar_all_mse, ones_ar_all_mae, multi_ar_all_mse, multi_ar_all_mae))
+        wandb.log({
+            "result/ones_ar_newly_mse": ones_ar_newly_mse,
+            "result/ones_ar_newly_mae": ones_ar_newly_mae,
+            "result/multi_ar_newly_mse": multi_ar_newly_mse,
+            "result/multi_ar_newly_mae": multi_ar_newly_mae,
+            "result/ones_ar_all_mse": ones_ar_all_mse,
+            "result/ones_ar_all_mae": ones_ar_all_mae,
+            "result/multi_ar_all_mse": multi_ar_all_mse,
+            "result/multi_ar_all_mae": multi_ar_all_mae
+        })
+        f.write('\n')
+        f.write('\n')
+        f.close()
         return

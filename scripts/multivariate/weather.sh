@@ -2,8 +2,8 @@ if [ ! -d "./logs" ]; then
     mkdir ./logs
 fi
 
-if [ ! -d "./logs/LongForecasting_v2" ]; then
-    mkdir ./logs/LongForecasting_v2
+if [ ! -d "./logs/LongForecasting" ]; then
+    mkdir ./logs/LongForecasting
 fi
 seq_len=96
 model_name=PathFormer
@@ -13,16 +13,16 @@ data_path_name=weather.csv
 model_id_name=weather
 data_name=custom
 
-for random_seed in 2024
+for random_seed in 99 999
 do
-for pred_len in 336 
+for pred_len in 96 192 336 720 
 do
     python -u run.py \
       --random_seed $random_seed \
       --is_training 1 \
       --root_path $root_path_name \
       --data_path $data_path_name \
-      --model_id $model_name'_'$model_id_name'_'$seq_len'_'$pred_len \
+      --model_id $model_id_name'_'$seq_len'_'$pred_len \
       --model $model_name \
       --data $data_name \
       --features M \
@@ -39,6 +39,6 @@ do
       --patience 10\
       --lradj 'TST'\
       --itr 1 \
-      --batch_size 256 --learning_rate 0.001 >logs/LongForecasting_v2/22_$model_name'_'$model_id_name'_'$seq_len'_'$pred_len.log 
+      --batch_size 256 --learning_rate 0.001 >logs/LongForecasting/$random_seed'_'$model_name'_'$model_id_name'_'$seq_len'_'$pred_len.log 
 done
 done

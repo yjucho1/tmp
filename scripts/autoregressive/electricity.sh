@@ -2,8 +2,8 @@ if [ ! -d "./logs" ]; then
     mkdir ./logs
 fi
 
-if [ ! -d "./logs/LongForecasting" ]; then
-    mkdir ./logs/LongForecasting
+if [ ! -d "./logs/Autoregressive" ]; then
+    mkdir ./logs/Autoregressive
 fi
 seq_len=96
 model_name=PathFormer
@@ -13,7 +13,7 @@ data_path_name=electricity.csv
 model_id_name=electricity
 data_name=custom
 
-for random_seed in 22
+for random_seed in 2024
 do
 for pred_len in 96 192 336 720
 do
@@ -40,7 +40,7 @@ do
       --lradj 'TST' \
       --pct_start 0.2 \
       --itr 1 \
-      --batch_size 8 --learning_rate 0.001 >logs/LongForecasting/$random_seed'_'$model_name'_'$model_id_name'_'$seq_len'_'$pred_len.log
+      --batch_size 8 --learning_rate 0.001 >logs/Autoregressive/$random_seed'_'$model_name'_'$model_id_name'_'$seq_len'_'$pred_len.log
 done
 done
 

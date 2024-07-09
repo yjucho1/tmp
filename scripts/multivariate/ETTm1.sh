@@ -14,7 +14,7 @@ model_id_name=ETTm1
 data_name=ETTm1
 
 
-for random_seed in 456
+for random_seed in 456 99 999
 do
 for pred_len in 96 192 336 720
 do

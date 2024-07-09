@@ -2,18 +2,18 @@ if [ ! -d "./logs" ]; then
     mkdir ./logs
 fi
 
-if [ ! -d "./logs/LongForecasting" ]; then
-    mkdir ./logs/LongForecasting
+if [ ! -d "./logs/Autoregressive" ]; then
+    mkdir ./logs/Autoregressive
 fi
 seq_len=96
 model_name=PathFormer
 
-root_path_name=./dataset/electricity
-data_path_name=electricity.csv
-model_id_name=electricity
+root_path_name=./dataset/traffic
+data_path_name=traffic.csv
+model_id_name=traffic
 data_name=custom
 
-for random_seed in 22
+for random_seed in 22 123 999 2024 456
 do
 for pred_len in 96 192 336 720
 do
@@ -28,19 +28,19 @@ do
       --features M \
       --seq_len $seq_len \
       --pred_len $pred_len \
-      --num_nodes 321 \
+      --patch_size_list 16 12 8 32\
+      --num_nodes 862 \
       --layer_nums 1 \
-      --residual_connection 1\
       --k 2\
       --d_model 16 \
       --d_ff 128 \
-      --patch_size_list 16 12 8 32 \
       --train_epochs 50\
+      --residual_connection 1\
       --patience 10 \
       --lradj 'TST' \
       --pct_start 0.2 \
       --itr 1 \
-      --batch_size 8 --learning_rate 0.001 >logs/LongForecasting/$random_seed'_'$model_name'_'$model_id_name'_'$seq_len'_'$pred_len.log
+      --batch_size 8 --learning_rate 0.0002 >logs/Autoregressive/$random_seed'_'$model_name'_'$model_id_name'_'$seq_len'_'$pred_len.log
 done
 done
 

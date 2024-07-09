@@ -13,7 +13,7 @@ data_path_name=traffic.csv
 model_id_name=traffic
 data_name=custom
 
-for random_seed in 22 123 999 2024 456
+for random_seed in 22
 do
 for pred_len in 96 192 336 720
 do
@@ -40,7 +40,7 @@ do
       --lradj 'TST' \
       --pct_start 0.2 \
       --itr 1 \
-      --batch_size 8 --learning_rate 0.0002 >logs/LongForecasting/$random_seed'_'$model_name'_'$model_id_name'_'$seq_len'_'$pred_len.log
+      --batch_size 4 --learning_rate 0.0002 >logs/LongForecasting/$random_seed'_'$model_name'_'$model_id_name'_'$seq_len'_'$pred_len.log
 done
 done
 
