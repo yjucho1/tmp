@@ -406,8 +406,8 @@ class Exp_Main(Exp_Basic):
         ones_ar_all_mse = []
         ones_ar_all_mae = []
 
-        hop = 2
-        pred_lookback = self.args.seq_len 
+        hop = 1
+        pred_lookback = self.args.seq_len
 
         self.model.eval()
 
@@ -484,7 +484,7 @@ class Exp_Main(Exp_Basic):
         print('mse: ', ones_ar_all_mse, multi_ar_all_mse)
         print('mae: ', ones_ar_all_mae, multi_ar_all_mae)
 
-        f = open("96_autoregressive_result.txt", 'a')
+        f = open(str(pred_lookback)+"_"+str(hop)+"_autoregressive_result.txt", 'a')
         f.write(setting + ",  ")
         f.write('{}, {}, {}, {},'.format(ones_ar_newly_mse, ones_ar_newly_mae, multi_ar_newly_mse, multi_ar_newly_mae))
         f.write('{}, {}, {}, {},'.format(ones_ar_all_mse, ones_ar_all_mae, multi_ar_all_mse, multi_ar_all_mae))

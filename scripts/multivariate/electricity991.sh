@@ -13,9 +13,9 @@ data_path_name=electricity.csv
 model_id_name=electricity
 data_name=custom
 
-for random_seed in 22
+for random_seed in 99
 do
-for pred_len in 336 720
+for pred_len in 96 192
 do
     python -u run.py \
       --random_seed $random_seed \

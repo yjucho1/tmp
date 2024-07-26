@@ -11,10 +11,10 @@ source /home/s3/${USER}/.bashrc
 source /home/s3/${USER}/anaconda3/bin/activate
 conda activate lisa_env
 # srun sh scripts/autoregressive/electricity.sh
-# srun sh scripts/autoregressive/ETTh1.sh
+srun sh scripts/autoregressive/ETTh1.sh
 # srun sh scripts/autoregressive/ETTh2.sh
 # srun sh scripts/autoregressive/ETTm1.sh
-srun sh scripts/autoregressive/ETTm2.sh
+# srun sh scripts/autoregressive/ETTm2.sh
 # srun sh scripts/autoregressive/ill.sh
 # srun sh scripts/autoregressive/traffic.sh
 # srun sh scripts/autoregressive/weather.sh

@@ -15,7 +15,7 @@ data_name=ETTm1
 
 for random_seed in 22 #123 456 99 999
 do
-for pred_len in 336 720 #96 192 
+for pred_len in 96 192 336 720
 do
     python -u run2.py \
       --random_seed $random_seed \
